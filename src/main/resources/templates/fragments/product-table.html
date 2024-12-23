@@ -1,0 +1,33 @@
+<div class="table-container">
+  <sl-card class="product-card">
+    <div slot="header">
+      <h2>Product List</h2>
+    </div>
+    <th:block th:fragment="product-table">
+      <div id="product-table">
+        <table class="product-table">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Handle</th>
+            <th>Vendor</th>
+            <th>Product type</th>
+            <th>Created at</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="product : ${products}">
+            <td th:text="${product.id}"></td>
+            <td th:text="${product.title}"></td>
+            <td th:text="${product.handle}"></td>
+            <td th:text="${product.vendor}"></td>
+            <td th:text="${product.product_type}"></td>
+            <td th:text="${product.created_at}"></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </th:block>
+  </sl-card>
+</div>

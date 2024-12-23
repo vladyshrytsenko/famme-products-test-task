@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <!-- Shoelace -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace/dist/themes/light.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace/dist/shoelace.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace/dist/shoelace.js"></script>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.19.1/cdn/components/dialog/dialog.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.19.1/cdn/components/button/button.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.19.1/cdn/components/input/input.js"></script>
+
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header>
+    <h1>Product Management</h1>
+</header>
+<main>
+    <!-- Table with products -->
+    <div class="table-container">
+        <sl-card class="product-card">
+            <div slot="header" class="header-container">
+                <h2>Product List</h2>
+                <div class="button-group">
+                    <button
+                            class="reload-button"
+                            hx-get="/test/table"
+                            hx-target="#product-table"
+                            hx-swap="outerHTML">
+                        Reload
+                    </button>
+                    <sl-button variant="success" id="open-dialog-button">Add product</sl-button>
+
+                    <!-- Shoelace Dialog -->
+                    <sl-dialog label="Add new product" class="dialog-overview">
+                        <!-- Form inside the dialog -->
+                        <form id="product-form">
+                            <sl-input label="Title" name="title" placeholder="Enter product title" required></sl-input>
+                            <br>
+
+                            <sl-input label="Handle" name="handle" placeholder="Enter product handle"></sl-input>
+                            <br>
+
+                            <sl-input label="Vendor" name="vendor" placeholder="Enter vendor name"></sl-input>
+                            <br>
+
+                            <sl-input label="Product Type" name="product_type" placeholder="Enter product type"></sl-input>
+                            <br>
+
+                            <sl-input type="datetime-local" label="Created at" name="created_at" required></sl-input>
+                            <br>
+
+                            <sl-button variant="primary" type="submit">Save</sl-button>
+                        </form>
+
+                        <!-- Footer with Close Button -->
+                        <sl-button slot="footer" variant="default" id="close-modal">Close</sl-button>
+                    </sl-dialog>
+
+                    <script>
+                        const dialog = document.querySelector('.dialog-overview');
+                        const openButton = document.getElementById('open-dialog-button');
+                        const closeButton = document.getElementById('close-modal');
+                        const productForm = document.getElementById('product-form');
+
+                        openButton.addEventListener('click', () => dialog.show());
+
+                        closeButton.addEventListener('click', () => dialog.hide());
+
+                        productForm.addEventListener('submit', (event) => {
+                            event.preventDefault();
+
+                            const formData = new FormData(productForm);
+                            const product = {
+                                title: formData.get('title'),
+                                handle: formData.get('handle'),
+                                vendor: formData.get('vendor'),
+                                product_type: formData.get('product_type'),
+                                created_at: new Date(formData.get('created_at')).toISOString()
+                            };
+
+                            fetch('/test/add-product', {
+                                method: 'POST',
+                                headers: {
+                                'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(product)
+                            })
+                            .then(response => {
+                                dialog.hide();
+                                htmx.trigger(document.querySelector('.reload-button'), 'click');
+                            })
+                            .catch((error) => {
+                                console.error('Error:', error);
+                            });
+                            htmx.trigger(document.querySelector('.reload-button'), 'click');
+                        });
+                    </script>
+                </div>
+            </div>
+            <div id="product-table" th:replace="fragments/product-table :: product-table"></div>
+        </sl-card>
+    </div>
+
+    <div id="add-product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-modal">&times;</span>
+            <h2>Add a New Product</h2>
+            <form id="add-product-form">
+                <label for="product-title">Product Title:</label>
+                <input type="text" id="product-title" name="title" required>
+                <br><br>
+                <label for="product-variants">Variants:</label>
+                <input type="text" id="product-variants" name="variants" required>
+                <br><br>
+                <button type="submit" class="submit-button">Submit</button>
+            </form>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>
