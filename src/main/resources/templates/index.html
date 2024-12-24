@@ -98,29 +98,12 @@
                             .catch((error) => {
                                 console.error('Error:', error);
                             });
-                            htmx.trigger(document.querySelector('.reload-button'), 'click');
                         });
                     </script>
                 </div>
             </div>
             <div id="product-table" th:replace="fragments/product-table :: product-table"></div>
         </sl-card>
-    </div>
-
-    <div id="add-product-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="close-modal">&times;</span>
-            <h2>Add a New Product</h2>
-            <form id="add-product-form">
-                <label for="product-title">Product Title:</label>
-                <input type="text" id="product-title" name="title" required>
-                <br><br>
-                <label for="product-variants">Variants:</label>
-                <input type="text" id="product-variants" name="variants" required>
-                <br><br>
-                <button type="submit" class="submit-button">Submit</button>
-            </form>
-        </div>
     </div>
 
 </main>
